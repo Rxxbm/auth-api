@@ -1,3 +1,4 @@
+// src/config/routes.ts
 import { Application as App, RequestHandler } from "express";
 import fs from "fs";
 
@@ -24,6 +25,10 @@ export function registerControllers(app: App, path: string) {
 }
 
 export function registerRoutes(app: App, controllerInstance: any) {
+  // Retrieve the base path from the controller metadata
+  const basePath: string =
+    Reflect.getMetadata("basePath", controllerInstance.constructor) || "";
+
   Object.getOwnPropertyNames(Object.getPrototypeOf(controllerInstance)).forEach(
     (methodName) => {
       // Retrieve route handler, path, HTTP method, and middlewares from metadata
@@ -39,16 +44,19 @@ export function registerRoutes(app: App, controllerInstance: any) {
         methodName
       ) as HttpMethod;
 
-      // get middlewares from Middeware decorators
+      // Get middlewares from Middleware decorators
       const middlewares: RequestHandler[] =
         Reflect.getMetadata("middlewares", controllerInstance, methodName) ||
         [];
+
       // If the method is valid, register the route with middlewares and the handler
       if (path && method) {
         const isMethodValid =
           method in app && typeof app[method] === "function";
         if (isMethodValid) {
-          (app[method] as Function)(path, ...middlewares, routeHandler);
+          // Combine the base path with the method-specific path
+          const fullPath = `${basePath}${path}`;
+          (app[method] as Function)(fullPath, ...middlewares, routeHandler);
         } else {
           console.warn(`Unsupported method '${method}' for route ${path}`);
         }

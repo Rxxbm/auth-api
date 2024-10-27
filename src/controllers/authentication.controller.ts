@@ -1,7 +1,9 @@
+import { Controller } from "../decorators/http/controller";
 import { Get } from "../decorators/http/methods";
 import { Middleware } from "../decorators/http/middleware";
 import { Request, Response, NextFunction } from "express";
 
+@Controller("/auth")
 export class AuthController {
   /**
    * @swagger
