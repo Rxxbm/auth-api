@@ -10,6 +10,8 @@ import listRoutes from "./config/routesLogger";
 
 const app = express();
 
+app.use(express.json());
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Middleware para ignorar o favicon
