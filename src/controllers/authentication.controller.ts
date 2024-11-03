@@ -2,7 +2,7 @@ import { Controller } from "../decorators/http/controller";
 import { Get, Post } from "../decorators/http/methods";
 import { Middleware } from "../decorators/http/middleware";
 import { Request, Response } from "express";
-import { CreateAccountDto } from "../dtos/authentication.dto";
+import { CreateAccountDto } from "../dtos/create-account.dto";
 import { CreateAccount } from "../services/create-account.service";
 import { AuthInMemoryRepository } from "../repositories/auth-in-memory.repository";
 import { ValidateDto } from "../config/dto";
@@ -10,6 +10,11 @@ import { hashPassword } from "../thirdparty/bcrypt";
 import { RouteResponse } from "../common/http-responses";
 import { ConflictError } from "../errors/conflict-error";
 import { EmployeeInMemoryRepository } from "../repositories/employee-in-memory.repository";
+import { LoginDto } from "../dtos/login.dto";
+import { Login } from "../services/login";
+import { UnauthorizedError } from "../errors/unauthorized-error";
+import { JwtToken, makeJwtToken } from "../thirdparty/jwt";
+import { NotFoundError } from "../errors/not-found-error";
 
 const authInMemoryRepository = new AuthInMemoryRepository();
 const employeeInMemoryRepository = new EmployeeInMemoryRepository();
@@ -17,7 +22,7 @@ const createAccountUseCase = new CreateAccount(
   employeeInMemoryRepository,
   authInMemoryRepository
 );
-
+const loginUsecase = new Login(authInMemoryRepository);
 @Controller("/auth")
 export class AuthController {
   /**
@@ -64,5 +69,42 @@ export class AuthController {
         return RouteResponse.serverError(error, response);
       }
     }
+  }
+
+  @Post("/login")
+  @Middleware(ValidateDto(LoginDto))
+  public async login(request: Request, response: Response) {
+    try {
+      const user = await loginUsecase.execute(request.body);
+
+      // Crie o payload com os dados do usuário
+      const payload = {
+        id: user.id,
+        email: user.email,
+        role: user.role, // ou outras propriedades relevantes do usuário
+      };
+
+      // Gere o token JWT
+      const token = makeJwtToken(payload);
+
+      // Responda com o token
+      return RouteResponse.success(response, { token });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error instanceof UnauthorizedError) {
+          return RouteResponse.unauthorized(response, error.message);
+        } else if (error instanceof NotFoundError) {
+          return RouteResponse.notFound(response, error.message);
+        }
+      } else {
+        return RouteResponse.serverError(error, response);
+      }
+    }
+  }
+
+  @Post("/me")
+  @JwtToken()
+  public async me(request: Request, response: Response) {
+    return RouteResponse.success(response, request.user);
   }
 }
