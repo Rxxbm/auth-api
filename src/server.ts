@@ -20,7 +20,7 @@ app.use(ignoreFavicon);
 // Middleware do Morgan com configuração de cores
 app.use(morganMiddleware);
 
-// Dynamically register all controllers in the 'controllers' directory
+// Dinamicamente registra todos os controllers nas rotas
 registerControllers(app, __dirname + "/controllers");
 
 const port = 3000;
