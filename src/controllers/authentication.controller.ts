@@ -109,7 +109,17 @@ export class AuthController {
   @Get("/me")
   @JwtToken()
   public async me(request: Request, response: Response) {
-    const profile = await getProfileUsecase.execute(request.user.auth_id);
-    return RouteResponse.success(response, { ...request.user, ...profile });
+    try {
+      const profile = await getProfileUsecase.execute(request.user.auth_id);
+      return RouteResponse.success(response, { ...request.user, ...profile });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error instanceof NotFoundError) {
+          return RouteResponse.notFound(response, error.message);
+        }
+      } else {
+        return RouteResponse.serverError(error, response);
+      }
+    }
   }
 }
