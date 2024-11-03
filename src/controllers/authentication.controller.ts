@@ -15,14 +15,18 @@ import { Login } from "../services/login";
 import { UnauthorizedError } from "../errors/unauthorized-error";
 import { JwtToken, makeJwtToken } from "../thirdparty/jwt";
 import { NotFoundError } from "../errors/not-found-error";
+import { GetProfile } from "../services/get-profile";
 
 const authInMemoryRepository = new AuthInMemoryRepository();
 const employeeInMemoryRepository = new EmployeeInMemoryRepository();
+
 const createAccountUseCase = new CreateAccount(
   employeeInMemoryRepository,
   authInMemoryRepository
 );
 const loginUsecase = new Login(authInMemoryRepository);
+const getProfileUsecase = new GetProfile(employeeInMemoryRepository);
+
 @Controller("/auth")
 export class AuthController {
   /**
@@ -75,13 +79,13 @@ export class AuthController {
   @Middleware(ValidateDto(LoginDto))
   public async login(request: Request, response: Response) {
     try {
-      const user = await loginUsecase.execute(request.body);
+      const auth = await loginUsecase.execute(request.body);
 
       // Crie o payload com os dados do usuário
       const payload = {
-        id: user.id,
-        email: user.email,
-        role: user.role, // ou outras propriedades relevantes do usuário
+        auth_id: auth.id,
+        email: auth.email,
+        role: auth.role, // ou outras propriedades relevantes do usuário
       };
 
       // Gere o token JWT
@@ -105,6 +109,7 @@ export class AuthController {
   @Post("/me")
   @JwtToken()
   public async me(request: Request, response: Response) {
-    return RouteResponse.success(response, request.user);
+    const profile = await getProfileUsecase.execute(request.user.auth_id);
+    return RouteResponse.success(response, { ...request.user, ...profile });
   }
 }
