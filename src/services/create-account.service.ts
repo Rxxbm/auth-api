@@ -3,7 +3,6 @@ import { CreateAccountDto } from "../dtos/authentication.dto";
 import { Employee } from "../entities/employee";
 import { ConflictError } from "../errors/conflict-error";
 import { AuthRepository } from "../repositories/auth-in-memory.repository";
-import { hashPassword } from "../thirdparty/bcrypt";
 
 export class CreateAccount {
   constructor(
@@ -17,12 +16,7 @@ export class CreateAccount {
       throw new ConflictError("Usuário já cadastrado");
     }
 
-    const hashedPassword = await hashPassword(account.password);
-
-    const auth = await this.authRepository.create({
-      ...account,
-      password: hashedPassword,
-    });
+    const auth = await this.authRepository.create(account);
 
     const newEmployee = {
       authId: auth.id,
