@@ -106,7 +106,7 @@ export class AuthController {
     }
   }
 
-  @Post("/me")
+  @Get("/me")
   @JwtToken()
   public async me(request: Request, response: Response) {
     const profile = await getProfileUsecase.execute(request.user.auth_id);
