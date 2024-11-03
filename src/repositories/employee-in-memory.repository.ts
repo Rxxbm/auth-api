@@ -1,12 +1,6 @@
 import { Repository } from "../common/protocols/repository";
 import { Employee } from "../entities/employee";
 
-export type Input = {
-  name: string;
-  jobTitle: string;
-  role: string;
-};
-
 export class EmployeeInMemoryRepository implements Repository<Employee> {
   private users: Employee[] = [];
 
@@ -30,10 +24,19 @@ export class EmployeeInMemoryRepository implements Repository<Employee> {
     return user ? user : null;
   }
 
+  async findByAuthId(authId: string): Promise<Employee | undefined> {
+    const user = this.users.find((user) => user.auth_id === authId);
+    return user ? user : undefined;
+  }
+
   async update(id: string, data: Partial<Employee>): Promise<Employee | null> {
     const index = this.users.findIndex((user) => user.id === id);
     if (index === -1) return null;
     this.users[index] = { ...this.users[index], ...data };
     return this.users[index];
   }
+}
+
+export interface EmployeeRepository extends Repository<Employee> {
+  findByAuthId(authId: string): Promise<Employee | undefined>;
 }
