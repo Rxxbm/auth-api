@@ -1,5 +1,5 @@
 import { Repository } from "../common/protocols/repository";
-import { CreateAccountDto } from "../dtos/authentication.dto";
+import { CreateAccountDto } from "../dtos/create-account.dto";
 import { Employee } from "../entities/employee";
 import { ConflictError } from "../errors/conflict-error";
 import { AuthRepository } from "../repositories/auth-in-memory.repository";
@@ -19,7 +19,7 @@ export class CreateAccount {
     const auth = await this.authRepository.create(account);
 
     const newEmployee = {
-      authId: auth.id,
+      auth_id: auth.id,
       departament: account.departament,
       role: auth.role,
       email: auth.email,
