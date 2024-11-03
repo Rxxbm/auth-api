@@ -13,7 +13,7 @@ export class AuthInMemoryRepository implements Repository<Auth> {
   }
 
   public async findByEmail(email: string) {
-    return this.users.find((user) => user.email === email);
+    return this.users?.find((user) => user.email === email);
   }
 
   public async list(): Promise<Auth[]> {
