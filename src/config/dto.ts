@@ -1,6 +1,7 @@
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { Request, Response, NextFunction, RequestHandler } from "express";
+import { RouteResponse } from "../common/http-responses";
 
 export function ValidateDto(dtoClass: any): RequestHandler {
   return async (
@@ -12,13 +13,14 @@ export function ValidateDto(dtoClass: any): RequestHandler {
     const errors = await validate(dtoInstance);
 
     if (errors.length > 0) {
-      res.status(400).json({
+      const errorMessages = errors
+        .map((error) => Object.values(error.constraints || {}))
+        .flat();
+
+      return RouteResponse.badRequest(res, {
         message: "Dados inválidos",
-        errors: errors
-          .map((error) => Object.values(error.constraints || {}))
-          .flat(),
+        errors: errorMessages,
       });
-      return;
     }
 
     req.body = dtoInstance;
