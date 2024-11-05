@@ -4,12 +4,12 @@ import { Middleware } from "../decorators/http/middleware";
 import { Request, Response } from "express";
 import { CreateAccountDto } from "../dtos/create-account.dto";
 import { CreateAccount } from "../services/create-account.service";
-import { AuthInMemoryRepository } from "../repositories/auth-in-memory.repository";
+import { authRepository } from "../repositories/auth-in-memory.repository";
 import { ValidateDto } from "../config/dto";
 import { hashPassword } from "../thirdparty/bcrypt";
 import { RouteResponse } from "../common/http-responses";
 import { ConflictError } from "../errors/conflict-error";
-import { EmployeeInMemoryRepository } from "../repositories/employee-in-memory.repository";
+import { employeeRepository } from "../repositories/employee-in-memory.repository";
 import { LoginDto } from "../dtos/login.dto";
 import { Login } from "../services/login";
 import { UnauthorizedError } from "../errors/unauthorized-error";
@@ -17,8 +17,8 @@ import { JwtToken, makeJwtToken } from "../thirdparty/jwt";
 import { NotFoundError } from "../errors/not-found-error";
 import { GetProfile } from "../services/get-profile";
 
-const authInMemoryRepository = new AuthInMemoryRepository(); // Instância do repositório de autenticação em memória
-const employeeInMemoryRepository = new EmployeeInMemoryRepository(); // Instância do repositório de funcionários em memória
+const authInMemoryRepository = authRepository; // Instância do repositório de autenticação em memória
+const employeeInMemoryRepository = employeeRepository; // Instância do repositório de funcionários em memória
 
 const createAccountUseCase = new CreateAccount( // Instância do caso de uso de criação de conta
   employeeInMemoryRepository,
@@ -61,18 +61,20 @@ export class AuthController {
    *                 enum: [Admin, User]
    *                 example: "User"
    *               department:
-   *                 type: string
+   *               - in: query
    *                 description: A célula do usuário.
-   *                 enum: [
-   *                   MarketingComunicação,
-   *                   MarketingPassiva,
-   *                   GestãoAdministrativaDePessoas,
-   *                   ProjetosQualidade,
-   *                   ProjetosComputação,
-   *                   PRESIDENCIA,
-   *                   AdministrativaFinanceiro,
-   *                   Comercial
-   *                 ]
+   *                 schema:
+   *                    type: string
+   *                    enum: [
+   *                      MarketingComunicação,
+   *                      MarketingPassiva,
+   *                      GestãoAdministrativaDePessoas,
+   *                      ProjetosQualidade,
+   *                      ProjetosComputação,
+   *                      PRESIDENCIA,
+   *                      AdministrativaFinanceiro,
+   *                      Comercial
+   *                    ]
    *                 example: "GestãoAdministrativaDePessoas"
    *               jobTitle:
    *                 type: string
