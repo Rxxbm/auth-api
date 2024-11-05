@@ -1,0 +1,31 @@
+POST http://localhost:3000/auth
+Content-Type: application/json
+
+{
+  "email": "b@mail.com",
+  "name": "Any Name",
+  "role": "User",
+  "password": "rubinoobrabo",
+  "jobTitle": "Assessor",
+  "departament": "ProjetosComputação"
+}
+
+### 
+
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "b@mail.com",
+  "password": "rubinoobrabo"
+}
+
+###
+
+GET http://localhost:3000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiNDYwNjM0MjAtZTdjZS00MGE3LWJkYTItZmNlOTc4NGI2YTQyIiwiZW1haWwiOiJhQG1haWwuY29tIiwicm9sZSI6IkFkbWluIiwiaWF0IjoxNzMwNjgxOTQ1LCJleHAiOjE3MzA2ODU1NDV9.kWDCZVI5zXmtAv6RNdwHgz-h3oWnaGavwoESqTY2log
+
+###
+
+GET http://localhost:3000/employee
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoX2lkIjoiZDRlMDk4MTAtNzU3My00NTBiLTg5MTUtYjlhMDVkMWI4N2Y4IiwiZW1haWwiOiJiQG1haWwuY29tIiwicm9sZSI6IlVzZXIiLCJpYXQiOjE3MzA2ODE5ODYsImV4cCI6MTczMDY4NTU4Nn0.mx7-aRv5V1YQ-8d4U5f6_kjrVeHPc47BhvX1ecjQgVc
