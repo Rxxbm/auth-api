@@ -2,7 +2,7 @@ import { Repository } from "../common/protocols/repository";
 import { CreateAccountDto } from "../dtos/create-account.dto";
 import { Employee } from "../entities/employee";
 import { ConflictError } from "../errors/conflict-error";
-import { AuthRepository } from "../repositories/auth-in-memory.repository";
+import { AuthRepository } from "../repositories/auth/auth-in-memory.repository";
 
 export class CreateAccount {
   constructor(
@@ -16,7 +16,13 @@ export class CreateAccount {
       throw new ConflictError("Usuário já cadastrado");
     }
 
-    const auth = await this.authRepository.create(account);
+    const newAuth = {
+      email: account.email,
+      password: account.password,
+      role: account.role,
+    };
+
+    const auth = await this.authRepository.create(newAuth);
 
     const newEmployee = {
       auth_id: auth.id,
