@@ -1,7 +1,7 @@
 import { LoginDto } from "../dtos/login.dto";
 import { NotFoundError } from "../errors/not-found-error";
 import { UnauthorizedError } from "../errors/unauthorized-error";
-import { AuthRepository } from "../repositories/auth-in-memory.repository";
+import { AuthRepository } from "../repositories/auth/auth-in-memory.repository";
 import { comparePasswords } from "../thirdparty/bcrypt";
 
 export class Login {

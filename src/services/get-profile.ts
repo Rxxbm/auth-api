@@ -1,5 +1,5 @@
 import { NotFoundError } from "../errors/not-found-error";
-import { EmployeeRepository } from "../repositories/employee-in-memory.repository";
+import { EmployeeRepository } from "../repositories/employee/employee-in-memory.repository";
 
 export class GetProfile {
   constructor(private readonly employeeRepository: EmployeeRepository) {}
