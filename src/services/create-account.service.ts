@@ -21,11 +21,8 @@ export class CreateAccount {
     const newEmployee = {
       auth_id: auth.id,
       departament: account.departament,
-      role: auth.role,
-      email: auth.email,
       jobTitle: account.jobTitle,
       name: account.name,
-      password: auth.password,
     };
 
     const employee = await this.employeeRepository.create(newEmployee);
