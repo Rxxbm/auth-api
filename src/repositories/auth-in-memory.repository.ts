@@ -40,3 +40,5 @@ export class AuthInMemoryRepository implements Repository<Auth> {
 export interface AuthRepository extends Repository<Auth> {
   findByEmail(email: string): Promise<Auth | undefined>;
 }
+
+export const authRepository = new AuthInMemoryRepository();

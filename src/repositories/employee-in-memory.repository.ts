@@ -11,6 +11,7 @@ export class EmployeeInMemoryRepository implements Repository<Employee> {
     this.users.push(account);
     return account;
   }
+  
   public async list(): Promise<Employee[]> {
     return this.users;
   }
@@ -40,3 +41,5 @@ export class EmployeeInMemoryRepository implements Repository<Employee> {
 export interface EmployeeRepository extends Repository<Employee> {
   findByAuthId(authId: string): Promise<Employee | undefined>;
 }
+
+export const employeeRepository = new EmployeeInMemoryRepository();
