@@ -4,28 +4,28 @@ import { Middleware } from "../decorators/http/middleware";
 import { Request, Response } from "express";
 import { CreateAccountDto } from "../dtos/create-account.dto";
 import { CreateAccount } from "../services/create-account.service";
-import { authRepository } from "../repositories/auth-in-memory.repository";
 import { ValidateDto } from "../config/dto";
 import { hashPassword } from "../thirdparty/bcrypt";
 import { RouteResponse } from "../common/http-responses";
 import { ConflictError } from "../errors/conflict-error";
-import { employeeRepository } from "../repositories/employee-in-memory.repository";
 import { LoginDto } from "../dtos/login.dto";
 import { Login } from "../services/login";
 import { UnauthorizedError } from "../errors/unauthorized-error";
-import { JwtToken, makeJwtToken } from "../thirdparty/jwt";
+import { makeJwtToken, PrivateRoute } from "../thirdparty/jwt";
 import { NotFoundError } from "../errors/not-found-error";
 import { GetProfile } from "../services/get-profile";
+import { authFirebaseRepo } from "../repositories/auth/auth-firebase.repository";
+import { employeeFirebaseRepo } from "../repositories/employee/employee-firebase.repository";
 
-const authInMemoryRepository = authRepository; // Instância do repositório de autenticação em memória
-const employeeInMemoryRepository = employeeRepository; // Instância do repositório de funcionários em memória
+const authFirebaseRepository = authFirebaseRepo; // Instância do repositório de autenticação no Firebase
+const employeeFirebaseRepository = employeeFirebaseRepo; // Instância do repositório de funcionários no Firebase
 
 const createAccountUseCase = new CreateAccount( // Instância do caso de uso de criação de conta
-  employeeInMemoryRepository,
-  authInMemoryRepository
+  employeeFirebaseRepository,
+  authFirebaseRepository
 );
-const loginUsecase = new Login(authInMemoryRepository); // Instância do caso de uso de login
-const getProfileUsecase = new GetProfile(employeeInMemoryRepository); // Instância do caso de uso de busca de perfil
+const loginUsecase = new Login(authFirebaseRepository); // Instância do caso de uso de login
+const getProfileUsecase = new GetProfile(employeeFirebaseRepository); // Instância do caso de uso de busca de perfil
 
 @Controller("/auth")
 export class AuthController {
@@ -328,7 +328,7 @@ export class AuthController {
    *         description: Perfil do usuário não encontrado
    */
   @Get("/me")
-  @JwtToken()
+  @PrivateRoute()
   public async me(request: Request, response: Response) {
     try {
       const profile = await getProfileUsecase.execute(request.user.auth_id); // Reaçiza busca do perfil do usuário pelo ID de autenticação
