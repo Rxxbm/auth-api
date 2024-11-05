@@ -10,7 +10,7 @@ declare module "express-serve-static-core" {
   }
 }
 
-export function JwtToken() {
+export function PrivateRoute() {
   return function (target: any, key: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
