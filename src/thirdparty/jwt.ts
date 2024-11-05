@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { RouteResponse } from "../common/http-responses";
+import { EmployeeRole } from "../common/enums";
 
 // Extensão da interface Request para incluir a propriedade 'user'
 declare module "express-serve-static-core" {
@@ -40,6 +41,35 @@ export function JwtToken() {
   };
 }
 
+export function Roles(requiredRoles: EmployeeRole[]) {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<any>
+  ) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = async function (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) {
+      // Simulação de decodificação do token e extração da role
+      const decodedToken = req.user; // Implemente esta função
+      const userRole = decodedToken.role;
+
+      // Verifica se a role do usuário está entre as roles permitidas
+      if (!requiredRoles.includes(userRole)) {
+        return RouteResponse.forbidden("Acesso negado!", res);
+      }
+
+      // Continua para o método original se a autorização passar
+      return originalMethod.apply(this, [req, res, next]);
+    };
+
+    return descriptor;
+  };
+}
 export const makeJwtToken = (payload: any) => {
   const secretKey = process.env.JWT || "default";
   return jwt.sign(payload, secretKey, { expiresIn: "1h" });
